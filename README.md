@@ -8,5 +8,17 @@ Passar o problema em linguagem natural e ver se a LLM responde corretamente. Usa
 Comparar com pedir para a LLM traduzir o problema para o Z3 e depois usar o Z3 e retornar a resposta pra LLM pra ver se ela acerta.
 
 # Autores
-| [<img loading="lazy" src="https://avatars.githubusercontent.com/u/99306045?v=4" width=115><br><sub>Rubens de Souza</sub>](https://github.com/souza-rubens) |  [<img loading="lazy" src="https://avatars.githubusercontent.com/u/180183446?v=4" width=115><br><sub>Rodrigo Sousa</sub>](https://github.com/rodrigossbjj) |  [<img loading="lazy" src="https://avatars.githubusercontent.com/u/176059611?v=4" width=115><br><sub>João Victor de Lima</sub>](https://github.com/vctr21) | [<img loading="lazy" src="https://avatars.githubusercontent.com/u/78152130?v=4" width=115><br><sub>Miguel Antônio</sub>](https://github.com/MiguelFFelix) |
-| :---: | :---: | :---: |
+<div align="center">
+<table>
+<tbody>
+<tr>
+<br>
+<td align="center"><a href="https://github.com/souza-rubens"><img src="https://avatars.githubusercontent.com/u/99306045?v=4" width="100px;" alt="Rubens de Souza"/><br /><sub><b>Rubens de Souza</b></sub></a><br /></td>
+<td align="center"><a href="https://github.com/rodrigossbjj"><img src="https://avatars.githubusercontent.com/u/180183446?v=4" width="100px;" alt="Rodrigo Sousa"/><br /><sub><b>Rodrigo Sousa</b></sub></a><br /></td>
+<td align="center"><a href="https://github.com/vctr21"><img src="https://avatars.githubusercontent.com/u/176059611?v=4" width="100px;" alt="João Victor de Lima"/><br /><sub><b>João Victor de Lima</b></sub></a><br /></td>
+<td align="center"><a href="https://github.com/MiguelFFelix"><img src="https://avatars.githubusercontent.com/u/78152130?v=4" width="100px;" alt="Miguel Antônio"/><br /><sub><b>Miguel Antônio</b></sub></a><br /></td>
+</tr>
+</tr>
+</tbody>
+</table>
+</div>
