@@ -2,6 +2,7 @@ import os
 from dotenv import load_dotenv
 import google.generativeai as genai
 import random
+from solverz3 import *
 
 #Loading environment variables from .env file
 load_dotenv()
@@ -9,7 +10,7 @@ load_dotenv()
 api_key = os.getenv("API_KEY")
 #Checking if API_KEY was successfully loaded
 if api_key:
-    print("Chave de API carregada com sucesso:")
+    print("Chave de API carregada com sucesso")
 else:
     print("Chave de API não encontrada no arquivo .env.")
 
@@ -33,11 +34,27 @@ with open(caminho_puzzle, "r", encoding="utf-8") as f:
     puzzle = f.read().strip()
 
 # Strategy for not asking too many questions
-puzzle += ". Traduza o problema para o Z3."
-
-# Z3 with correct answer
-# ----- PROGRESS -------
+puzzle += ". Traduza o problema para o Z3 em Python usando a biblioteca z3-solver."
 
 resposta = model.generate_content(puzzle)
 
+print(puzzle)
 print(resposta.text)
+
+resposta_direta = model.generate_content(puzzle + " Quem é cavaleiro e quem é patife?")
+
+print(resposta_direta.text)
+
+# Z3 with correct answer
+try:
+    variables, restrictions = parse_puzzle_to_z3(puzzle)
+    resultado_z3 = generic_solver(variables, restrictions)
+
+    print("Resposta correta (Z3 real)\n")
+    if isinstance(resultado_z3, dict):
+        for p, v in resultado_z3.items():
+            print(f"{p}: {'Cavaleiro' if v else 'Patife'}")
+    else:
+        print(resultado_z3)
+except Exception as e:
+    print(f"Erro ao resolver com Z3: {e}")
