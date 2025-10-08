@@ -13,13 +13,14 @@ if api_key:
     print("Chave de API carregada com sucesso")
 else:
     print("Chave de API não encontrada no arquivo .env.")
+    exit()
 
 genai.configure(api_key=api_key)
 model = genai.GenerativeModel("gemini-2.5-flash")
 
 puzzles_dir = "puzzles"
 
-# Listar arquivos .txt dentro da pasta
+# List .txt files within folder
 arquivos = [f for f in os.listdir(puzzles_dir) if f.endswith(".txt")]
 
 if not arquivos:
@@ -36,10 +37,10 @@ with open(caminho_puzzle, "r", encoding="utf-8") as f:
 # Strategy for not asking too many questions
 puzzle += ". Traduza o problema para o Z3 em Python usando a biblioteca z3-solver."
 
-resposta = model.generate_content(puzzle)
+# resposta = model.generate_content(puzzle)
 
 print(puzzle)
-print(resposta.text)
+# print(resposta.text)
 
 resposta_direta = model.generate_content(puzzle + " Quem é cavaleiro e quem é patife?")
 
@@ -50,6 +51,8 @@ try:
     variables, restrictions = parse_puzzle_to_z3(puzzle)
     resultado_z3 = generic_solver(variables, restrictions)
 
+    print(variables)
+    print (restrictions)
     print("Resposta correta (Z3 real)\n")
     if isinstance(resultado_z3, dict):
         for p, v in resultado_z3.items():

@@ -21,48 +21,70 @@ def generic_solver(variables, restrictions):
 
 def parse_puzzle_to_z3(puzzle_text):
     """
-    Interprets simple Knights and Knaves puzzles (A, B, C, ...) and generates variables and restrictions.
-    It is generic for up to 3 characters. Returns (variables, restrictions).
+    Parses simple Knights and Knaves puzzles (A, B, C, ...) and generates Z3 variables and constraints.
+    Returns a tuple (variables, restrictions).
     """
-    # Extract possible characters (A, B, C, D, ...)
-    names = re.findall(r"\b([A-Z])\s+diz:", puzzle_text)
-    names = sorted(set(names))
+    # Detect all characters that speak (e.g., A, B, C)
+    names = sorted(set(re.findall(r"\b([A-Z])\s+diz:", puzzle_text)))
     if not names:
-        raise ValueError("Nenhum personagem encontrado no texto do puzzle.")
+        raise ValueError("No characters found in the puzzle text.")
 
-    # Creates boolean variables: True = knight, False = scoundrel
+    # Create Z3 boolean variables: True = knight, False = knave
     variables = {n: Bool(n) for n in names}
     restrictions = []
 
-    # Simple pattern-based parser
-    for n in names:
-        if f"{n} diz" not in puzzle_text:
+    # Capture all statements in the format "X diz: '...'"
+    statements = re.findall(r"([A-Z])\s+diz:\s*'([^']+)'", puzzle_text)
+    for n, statement in statements:
+        statement = statement.strip()
+
+        # Pattern: "X é um patife"
+        m = re.match(r"([A-Z])\s+é\s+um\s+patife", statement)
+        if m:
+            ref = m.group(1)
+            restrictions.append(variables[n] == Not(variables[ref]))
             continue
 
-        fala = puzzle_text.split(f"{n} diz:")[-1].split("'")[1]  # take what is in quotes
+        # Pattern: "X é um cavaleiro"
+        m = re.match(r"([A-Z])\s+é\s+um\s+cavaleiro", statement)
+        if m:
+            ref = m.group(1)
+            restrictions.append(variables[n] == variables[ref])
+            continue
 
-        # Example 1: "B é um patife."
-        if "é um patife" in fala:
-            ref = fala.strip()[0]  # fist letter (ex: B)
-            if ref in variables:
-                restr = variables[n] == Not(variables[ref])  # If A is knight, then B is Knaves 
-                restrictions.append(restr)
+        # Pattern: "X e eu somos diferentes"
+        m = re.match(r"([A-Z])\s+e\s+eu\s+somos\s+diferentes", statement)
+        if m:
+            ref = m.group(1)
+            restrictions.append(variables[n] == (variables[n] != variables[ref]))
+            continue
 
-        # Exemple 2: "A e eu somos diferentes."
-        elif "somos diferentes" in fala:
-            ref = fala.strip()[0]
-            if ref in variables:
-                restr = variables[n] == (variables[n] != variables[ref])
-                restrictions.append(restr)
+        # Pattern: "X e eu somos iguais"
+        m = re.match(r"([A-Z])\s+e\s+([A-Z])\s+somos\s+iguais", statement)
+        if m:
+            ref1, ref2 = m.group(1), m.group(2)
+            restrictions.append(variables[ref1] == (variables[ref1] == variables[ref2]))
+            continue
 
-        # Exemple 3: "A e eu somos iguais."
-        elif "somos iguais" in fala:
-            ref = fala.strip()[0]
-            if ref in variables:
-                restr = variables[n] == (variables[n] == variables[ref])
-                restrictions.append(restr)
+        # Pattern: "Eu sou um cavaleiro"
+        if re.match(r"Eu sou um cavaleiro", statement):
+            restrictions.append(variables[n] == True)
+            continue
+
+        # Pattern: "Eu sou um patife"
+        if re.match(r"Eu sou um patife", statement):
+            restrictions.append(variables[n] == False)
+            continue
+
+        # Pattern: "X e Y são diferentes" (X != Y)
+        m = re.match(r"([A-Z])\s+e\s+([A-Z])\s+somos\s+diferentes", statement)
+        if m:
+            ref1, ref2 = m.group(1), m.group(2)
+            # ref1 diz que ref1 e ref2 são diferentes
+            restrictions.append(variables[ref1] == (variables[ref1] != variables[ref2]))
+            continue
 
     if not restrictions:
-        raise ValueError("Nenhuma restrição reconhecida no puzzle. Verifique o formato.")
+        raise ValueError("No recognizable constraints found in the puzzle.")
 
     return variables, restrictions
