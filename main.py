@@ -35,14 +35,14 @@ with open(caminho_puzzle, "r", encoding="utf-8") as f:
     puzzle = f.read().strip()
 
 # Strategy for not asking too many questions
-puzzle += ". Traduza o problema para o Z3 em Python usando a biblioteca z3-solver."
+puzzle += ". Diretamente resolva o problema: Quem podemos garantir que é cavaleiro e quem é patife?"
 
 # resposta = model.generate_content(puzzle)
 
 print(puzzle)
 # print(resposta.text)
 
-resposta_direta = model.generate_content(puzzle + " Quem é cavaleiro e quem é patife?")
+resposta_direta = model.generate_content(puzzle + " Agora com ajuda da biblioteca Z3, traduza o problema para Z3 e resolva: Quem podemos garantir que é cavaleiro e quem é patife? Retorne o resultado assim por ex: A: cavaleiro")
 
 print(resposta_direta.text)
 
@@ -51,13 +51,18 @@ try:
     variables, restrictions = parse_puzzle_to_z3(puzzle)
     resultado_z3 = generic_solver(variables, restrictions)
 
-    print(variables)
-    print (restrictions)
+    # print(variables)
+    # print (restrictions)
     print("Resposta correta (Z3 real)\n")
     if isinstance(resultado_z3, dict):
         for p, v in resultado_z3.items():
             print(f"{p}: {'Cavaleiro' if v else 'Patife'}")
     else:
         print(resultado_z3)
+
+    print("\nConsequências Lógicas (O que é garantido)")
+    consequencias = logical_consequences(variables, restrictions)
+    for nome, status in consequencias.items():
+        print(f"{nome}: {status}")
 except Exception as e:
     print(f"Erro ao resolver com Z3: {e}")

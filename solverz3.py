@@ -88,3 +88,35 @@ def parse_puzzle_to_z3(puzzle_text):
         raise ValueError("No recognizable constraints found in the puzzle.")
 
     return variables, restrictions
+
+
+
+def logical_consequences(variables, restrictions):
+    """
+    Check which variables (people) have their value logically determined
+    by the puzzle constraints.
+    Returns a dict: { 'A': 'Knight' | 'Scoundrel' | 'Undetermined' }
+    """
+    results = {}
+    
+    for name, var in variables.items():
+        s1 = Solver()
+        s1.add(restrictions)
+        s1.add(Not(var))  # Testa se pode ser falso
+        can_be_false = (s1.check() == sat)
+        
+        s2 = Solver()
+        s2.add(restrictions)
+        s2.add(var)  # Testa se pode ser verdadeiro
+        can_be_true = (s2.check() == sat)
+        
+        if can_be_true and not can_be_false:
+            results[name] = "Cavaleiro (necessariamente verdadeiro)"
+        elif can_be_false and not can_be_true:
+            results[name] = "Patife (necessariamente falso)"
+        elif can_be_true and can_be_false:
+            results[name] = "Indeterminado (pode ser ambos)"
+        else:
+            results[name] = "Inconsistente (sem modelo possível)"
+    
+    return results
